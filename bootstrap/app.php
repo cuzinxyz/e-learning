@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 return response()->json([
                     'status' => false,
-                    'message' => Messages::NOT_FOUND,
+                    'message' => Messages::ROUTE_NOT_FOUND,
                     'data' => null,
                 ], 404);
             }
