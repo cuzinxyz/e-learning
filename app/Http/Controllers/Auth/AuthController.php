@@ -8,6 +8,7 @@ use App\Constants\AuthenticationCode;
 use App\Constants\Messages;
 use App\Events\Auth\UserCreated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\VerifyAccountRequest;
 use App\Services\Auth\AuthService;
@@ -55,7 +56,6 @@ class AuthController extends Controller
             ]));
 
             return $this->sendResponse(status: true, message: Messages::SUCCESS, code: Response::HTTP_OK);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::channel('exception')->error($e->getMessage());
@@ -95,7 +95,6 @@ class AuthController extends Controller
             }
 
             return $this->sendResponse(status: true, message: Messages::SUCCESS, code: Response::HTTP_OK);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::channel('exception')->error($e->getMessage());
@@ -117,5 +116,36 @@ class AuthController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * @param LoginRequest $req
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $req): JsonResponse
+    {
+        try {
+            $user = $this->authService->login($req->validated());
+
+            if (!$user) {
+                return $this->sendResponse(status: false, message: Messages::WRONG_INFORMATION, code: Response::HTTP_UNAUTHORIZED);
+            }
+
+            if (!$user?->email_verified_at) {
+                return $this->sendResponse(status: false, message: Messages::NOT_AUTHENTICATED, code: Response::HTTP_UNAUTHORIZED);
+            }
+
+            $response = [
+                'access_token' => $user?->createToken($req->device_name ?: '')?->plainTextToken
+            ];
+
+            return $this->sendResponse(status: true, message: Messages::SUCCESS, code: Response::HTTP_OK, data: $response);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::channel('exception')->error($e->getMessage());
+
+            return $this->sendResponse(status: false, message: Messages::EXCEPTION, code: Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
