@@ -9,6 +9,7 @@ use App\Models\AuthenticationCode;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 /**
@@ -120,5 +121,15 @@ class AuthService
         $user->saveOrFail();
 
         return $user;
+    }
+
+    public function login(array $data): User|bool
+    {
+        if (!Auth::attempt($data)) {
+            return false;
+        }
+
+        return User::where('email', $data['email'])
+            ->firstOrFail();
     }
 }
