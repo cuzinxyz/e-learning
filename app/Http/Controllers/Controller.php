@@ -16,8 +16,8 @@ abstract class Controller
     protected function sendResponse(
         bool $status,
         string $message,
-        mixed $data = null,
-        int $code = 200
+        int $code = 200,
+        mixed $data = null
     ) {
         return response()->json(
             [
