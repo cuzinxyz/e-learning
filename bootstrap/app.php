@@ -46,14 +46,14 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function(AuthenticationException $e, Request $req) {
+        $exceptions->render(function (AuthenticationException $e, Request $req) {
             if ($req->is('api/*')) {
                 Log::channel('exception')->error("Exception: {$e->getMessage()}");
 
                 return response()->json([
                     'status' => false,
                     'message' => Messages::NOT_AUTHENTICATED,
-                    'data' => null
+                    'data' => null,
                 ], Response::HTTP_UNAUTHORIZED);
             }
         });

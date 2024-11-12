@@ -136,7 +136,7 @@ class AuthController extends Controller
             }
 
             $response = [
-                'access_token' => $user?->createToken($req->device_name ?: '')?->plainTextToken
+                'access_token' => $user?->createToken($req->device_name ?: '')?->plainTextToken,
             ];
 
             return $this->sendResponse(status: true, message: Messages::SUCCESS, code: Response::HTTP_OK, data: $response);

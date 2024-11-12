@@ -6,6 +6,7 @@ namespace App\Listeners;
 
 use App\Events\Auth\UserCreated;
 use Illuminate\Support\Facades\Mail;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class SendAuthenticationCode
 {
@@ -40,5 +41,18 @@ class SendAuthenticationCode
                     ->subject($subject);
             }
         );
+
+        $text = "A new contact us query\n"
+            . "<b>Email Address: </b>\n"
+            . "$email\n"
+            . "<b>Message: </b>\n"
+            . $subject;
+
+        // Telegram
+        Telegram::sendMessage([
+            'chat_id' => env('TELEGRAM_CHAT_ID'),
+            'text' => $text,
+            'parse_mode' => 'HTML',
+        ]);
     }
 }
